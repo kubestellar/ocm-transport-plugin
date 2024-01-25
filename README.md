@@ -1,2 +1,2 @@
 # ocm_transport
-KubeStellar transport implementation based on Open-Cluster-Management
+KubeStellar transport plugin implementation based on Open-Cluster-Management
