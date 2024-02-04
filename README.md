@@ -2,7 +2,6 @@
 KubeStellar transport plugin implementation based on Open-Cluster-Management
 
 <br>
-
 <td>
     <a href="https://landscape.cncf.io">
         <img src="docs/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
