@@ -13,11 +13,6 @@
 # limitations under the License.
 
 # Image repo/tag to use all building/pushing image targets
-COMPONENT := $(shell basename $(shell pwd))
-IMAGE_TAG ?= latest
-IMAGE := ${REGISTRY}/${COMPONENT}:${IMAGE_TAG}
-
-
 DOCKER_REGISTRY ?= ghcr.io/Kubestellar
 COMPONENT ?= $(shell basename $(shell pwd))
 IMAGE_TAG ?= 0.20.0-alpha.1
