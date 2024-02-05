@@ -18,7 +18,7 @@ IMAGE_TAG ?= 0.20.0-alpha.1
 
 .PHONY: build	
 build: ## Builds OCM based transport executable.
-	go build -o bin/ocm_transport cmd/main.go
+	go build -o bin/ocm-transport-plugin cmd/transport-operator/main.go
 
 .PHONY: fmt
 fmt:	## Run go fmt against code.
@@ -30,7 +30,7 @@ vet:	## Run go vet against code.
 
 .PHONY: build-push
 build-push: vet fmt ## Build and push container image with ko.
-	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B cmd/main.go -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
+	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B ./cmd/transport-operator -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
 
 .PHONY: help 
 help: ## Show this help message.

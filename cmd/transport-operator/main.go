@@ -18,7 +18,7 @@ package main
 
 import (
 	cmd "github.com/kubestellar/kubestellar/cmd/transport"
-	ocm "github.com/kubestellar/ocm_transport/pkg"
+	ocm "github.com/kubestellar/ocm-transport-plugin/pkg"
 )
 
 func main() {
