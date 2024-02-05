@@ -13,9 +13,8 @@
 # limitations under the License.
 
 # Image repo/tag to use all building/pushing image targets
-DOCKER_REGISTRY ?= ghcr.io/Kubestellar/ocm-transport-plugin
+DOCKER_REGISTRY ?= ghcr.io/kubestellar/ocm-transport-plugin
 IMAGE_TAG ?= 0.20.0-alpha.1
-IMAGE ?= ${DOCKER_REGISTRY}/${COMPONENT}:${IMAGE_TAG}
 
 .PHONY: build	
 build: ## Builds OCM based transport executable.
@@ -31,7 +30,7 @@ vet:	## Run go vet against code.
 
 .PHONY: build-push
 build-push: vet fmt ## Build and push container image with ko.
-	KO_DOCKER_REPO=${COMPONENT} ko build -B cmd/main.go -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
+	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B cmd/main.go -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
 
 .PHONY: help 
 help: ## Show this help message.
