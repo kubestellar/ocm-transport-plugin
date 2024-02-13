@@ -1,3 +1,14 @@
+builds:
+- id: ocm-transport-plugin
+  main: ./cmd/ocm-transport-plugin
+  binary: ocm-transport-plugin
+  goos:
+  - linux
+  - darwin
+  goarch:
+  - amd64
+  - arm64
+
 kos:           
   - repository: ghcr.io/kubestellar/ocm-transport-plugin
     main: ./cmd/ocm-transport-plugin
