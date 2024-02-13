@@ -12,7 +12,7 @@ builds:
 kos:           
   - repository: ghcr.io/kubestellar/ocm-transport-plugin
     main: ./cmd/ocm-transport-plugin
-    build: manager
+    build: ocm-transport-plugin
     tags:
     - '{{.Version}}'
     - latest
