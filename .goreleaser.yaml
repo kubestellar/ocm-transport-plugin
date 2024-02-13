@@ -1,0 +1,22 @@
+kos:           
+  - repository: ghcr.io/kubestellar/ocm-transport-plugin
+    main: ./cmd/ocm-transport-plugin
+    build: manager
+    tags:
+    - '{{.Version}}'
+    - latest
+    bare: true
+    preserve_import_paths: false
+    ldflags:
+    - "{{ .Env.LDFLAGS }}"
+    platforms:
+    - linux/amd64
+    - linux/arm64
+    env:
+    - CGO_ENABLED=0
+release:
+  draft: false
+  prerelease: auto
+  mode: keep-existing
+
+
