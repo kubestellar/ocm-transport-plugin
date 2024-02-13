@@ -127,6 +127,7 @@ MutatingWebhookConfiguration
 NegotiatedAPIResource
 NetworkPolicy
 Nir
+OCM
 OLM
 ObjectMeta
 Onboarding
@@ -186,6 +187,7 @@ SyncerConfigs
 TBD
 TCP
 TMC
+TLC
 TODO
 Teardown
 TokenReview
@@ -199,6 +201,7 @@ Upsynced
 Upsyncing
 ValidatingWebhookConfiguration
 VolumeAttachment
+WDS
 WorkspaceType
 WMW
 WMWs
@@ -343,6 +346,7 @@ nav
 nonNamespacedObjects
 nonResourceURLs
 ns
+ocm
 onboarding
 openshift
 opensource
