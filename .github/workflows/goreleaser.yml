@@ -45,22 +45,3 @@ jobs:
         KO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USER: ${{ github.actor }}
         EMAIL: ${{ github.actor}}@users.noreply.github.com
-
-    - name: Set up Helm
-      uses: azure/setup-helm@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Login to registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Package and push chart
-      run: |
-        make chart IMG=${{ env.REGISTRY }}/${{ env.CONTROLLER_IMAGE }}:${{github.ref_name}}
-        helm package ${{ env.CHART_PATH }} --destination . --version ${{github.ref_name}} --app-version ${{github.ref_name}}
-        helm push ./*.tgz oci://${{ env.REGISTRY }}/${{ env.CHART_IMAGE }}    
-
