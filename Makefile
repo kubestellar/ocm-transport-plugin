@@ -32,14 +32,10 @@ fmt:	## Run go fmt against code.
 vet:	## Run go vet against code.
 	go vet ./...
 
-.PHONY: build-local
-build-local: vet fmt ## Build local container image with `ko`
+.PHONY: ko-build-local
+ko-build-local: vet fmt ## Build local container image with `ko`
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build --push=false -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE}
-
-.PHONY: build-push
-build-push: vet fmt ## Build and push container image with `ko`.
-	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
 
 .PHONY: help 
 help: ## Show this help message.
