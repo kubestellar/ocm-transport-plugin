@@ -22,7 +22,7 @@ ARCH := $(shell go env GOARCH)
 
 .PHONY: build	
 build: ## Builds OCM based transport executable.
-	go build -o bin/ocm-transport-plugin cmd/transport/main.go
+	go build -o bin/ocm-transport-plugin ./cmd/ocm-transport-plugin/main.go
 
 .PHONY: fmt
 fmt:	## Run go fmt against code.
@@ -34,7 +34,7 @@ vet:	## Run go vet against code.
 
 .PHONY: ko-build-local
 ko-build-local: vet fmt ## Build local container image with `ko`
-	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build --push=false -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
+	KO_DOCKER_REPO=ko.local ko build --push=false -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE}
 
 .PHONY: help 
