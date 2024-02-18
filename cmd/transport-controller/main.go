@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	cmd "github.com/kubestellar/kubestellar/cmd/transport"
+	"github.com/kubestellar/kubestellar/pkg/transport/cmd"
 	ocm "github.com/kubestellar/ocm-transport-plugin/pkg"
 )
 
 func main() {
-	cmd.Run(ocm.NewOCMTransport())
+	cmd.GenericMain(ocm.NewOCMTransport())
 }
