@@ -11,9 +11,7 @@ permissions:
  
 env:
   REGISTRY: ghcr.io
-  CONTROLLER_IMAGE: kubestellar/ocm-transport-plugin
-  CHART_IMAGE: kubestellar/ocm-transport-plugin-chart
-  CHART_PATH: ./chart
+  CONTROLLER_IMAGE: kubestellar/ocm-transport-plugin/transport-controller
 
 jobs:
   goreleaser:
