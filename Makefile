@@ -14,7 +14,7 @@
 
 # Image repo/tag to use all building/pushing image targets
 DOCKER_REGISTRY ?= ghcr.io/kubestellar/ocm-transport-plugin
-IMAGE_TAG ?= 0.1.0.rc1
+IMAGE_TAG ?= 0.1.0.rc2
 CMD_NAME ?= transport-controller
 IMAGE ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
 
