@@ -5,7 +5,6 @@
 <br/>
 <br/>
 <br/>
-<br/>
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/ocm-transport-plugin)](https://goreportcard.com/report/github.com/kubestellar/ocm-transport-plugin)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/ocm-transport-plugin.svg)](https://pkg.go.dev/github.com/kubestellar/ocm-transport-plugin)
@@ -29,8 +28,14 @@ Transport controller is a mandatory part of KubeStellar and should run in a work
 1.  Set the following environment variables:
     
     1.  Set `TRANSPORT_KUBECONFIG` environment variable to hold the transport kubeconfig file path.
+        ```
+        export TRANSPORT_KUBECONFIG=my_transport_kubeconfig_filepath
+        ```
 
     1.  Set `WDS_KUBECONFIG` environment variable to hold the WDS kubeconfig file path.
+        ```
+        export WDS_KUBECONFIG=my_wds_kubeconfig_filepath
+        ```
     
     1.  Set `WDS_NAME` environment variable to hold a unique name for the WDS, e.g:
         ```
