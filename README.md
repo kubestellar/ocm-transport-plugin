@@ -1,9 +1,19 @@
-# ocm-transport-plugin
-KubeStellar transport plugin implementation based on Open-Cluster-Management
+<img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
-## Getting Started
+<br/>
+<br/>
+<br/>
+<br/>
 
-## Build and run ocm transport controller locally
+This repository is the (Open-Cluster-Management)[https://open-cluster-management.io/] based implementation of KubeStellar transport controller. 
+KubeStellar transport controller is a component that is responsible for propagating selected objects from the center to the WECs.
+Transport controller is pluggable and allows implementing it using different plugins. 
+Transport controller is a mandatory part of KubeStellar and should run in a working system with one of the plugin implementations.
+
+
+# Getting Started
+
+## Build and run ocm transport controller locally using executable process
 
 1.  Run the following command to build locally ocm transport controller executable:
     ```
