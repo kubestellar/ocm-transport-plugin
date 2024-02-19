@@ -10,7 +10,7 @@ builds:
   - arm64
 
 kos:           
-  - repository: ghcr.io/kubestellar/ocm-transport-plugin
+  - repository: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller
     main: ./cmd/transport-controller
     build: ocm-transport-plugin
     tags:
