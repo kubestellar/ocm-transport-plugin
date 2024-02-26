@@ -1,7 +1,7 @@
 builds:
 - id: ocm-transport-plugin
   main: ./cmd/transport-controller
-  binary: transport-controller
+  binary: ocm-transport-plugin
   goos:
   - linux
   - darwin
