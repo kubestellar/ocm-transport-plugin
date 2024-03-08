@@ -21,7 +21,7 @@ IMAGE ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
 ARCH := $(shell go env GOARCH)
 
 .PHONY: build	
-build: vet fmt modules ## Builds OCM based transport executable.
+build: modules vet fmt  ## Builds OCM based transport executable.
 	go build -o bin/ocm-transport-plugin ./cmd/${CMD_NAME}/main.go
 
 .PHONY: fmt
@@ -37,7 +37,7 @@ modules:	## Run go tidy against code.
 	go mod tidy
 
 .PHONY: ko-build-local
-ko-build-local: vet fmt modules ## Build local container image with `ko`.
+ko-build-local: modules vet fmt  ## Build local container image with `ko`.
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE}
 
