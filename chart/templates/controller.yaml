@@ -81,8 +81,8 @@ spec:
           mountPath: /mnt/shared
       containers:
         - name: transport-controller
-          image: {{ .Values.controller.image }}:{{ .Values.controller.tag | default "latest" }}
-          imagePullPolicy: {{ .Values.controller.pullPolicy | default "Always" }}
+          image: otp_controller_image
+          imagePullPolicy: IfNotPresent
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
@@ -92,9 +92,9 @@ spec:
           - name: shared-volume
             mountPath: /mnt/shared
             readOnly: true
-      {{- if .Values.local_image }}
+      {{- if .Values.HOST_IP }}
       hostAliases:
-      - ip: ${HOST_IP}
+      - ip: {{ .Values.HOST_IP }}
         hostnames: [ "{{ .Values.wds_cp_name }}.localtest.me", "{{ .Values.transport_cp_name }}.localtest.me" ]
       {{- end }}
       volumes:

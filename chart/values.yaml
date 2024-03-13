@@ -12,17 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Selet the operator image
-controller:
-  image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller
-  tag: 0.1.0.rc4
-  pullPolicy: IfNotPresent
-
-# Set the name of the WDS control plane
-wds_cp_name: wds1
 # Set the name of the transport control plane
 transport_cp_name: imbs1
 
-# Set local_image to true when running the chart with a locally built image,
-# e.g. during e2e testing
-local_image: false
+# Set the name of the WDS control plane
+wds_cp_name: wds1
+
+# Set the HOST_IP to the host os ip address to use the chart with a locally built image (e.g. during e2e testing)
+# HOST_IP: <host os ip address>
