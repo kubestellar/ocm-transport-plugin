@@ -26,24 +26,23 @@ data:
     # The function returns the requested kubeconfig's content in base64.
     # it assumes the kubeconfig context is set to access the hosting cluster.
 
-    cpname="\$1"
-    get_incluster_key="\$2"
+    cpname="$1"
+    get_incluster_key="$2"
 
     key=""
-    if [[ "\$get_incluster_key" == "true" ]]; then
-      key=\$(kubectl get controlplane \$cpname -o=jsonpath='{.status.secretRef.inClusterKey}');
+    if [[ "$get_incluster_key" == "true" ]]; then
+      key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.inClusterKey}');
     else
-      key=\$(kubectl get controlplane \$cpname -o=jsonpath='{.status.secretRef.key}');
+      key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.key}');
     fi
 
     # get secret details
-    secret_name=\$(kubectl get controlplane \$cpname -o=jsonpath='{.status.secretRef.name}')
-    secret_namespace=\$(kubectl get controlplane \$cpname -o=jsonpath='{.status.secretRef.namespace}')
+    secret_name=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.name}')
+    secret_namespace=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.namespace}')
 
     # get the kubeconfig in base64
-    kubectl get secret \$secret_name -n \$secret_namespace -o=jsonpath="{.data.\$key}"
+    kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,6 +81,7 @@ spec:
       containers:
         - name: transport-controller
           image: otp_controller_image
+          # image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
           imagePullPolicy: IfNotPresent
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
