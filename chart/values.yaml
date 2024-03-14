@@ -17,6 +17,3 @@ transport_cp_name: imbs1
 
 # Set the name of the WDS control plane
 wds_cp_name: wds1
-
-# Set the HOST_IP to the host os ip address to use the chart with a locally built image (e.g. during e2e testing)
-# HOST_IP: <host os ip address>

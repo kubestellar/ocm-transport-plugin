@@ -92,11 +92,6 @@ spec:
           - name: shared-volume
             mountPath: /mnt/shared
             readOnly: true
-      {{- if .Values.HOST_IP }}
-      hostAliases:
-      - ip: {{ .Values.HOST_IP }}
-        hostnames: [ "{{ .Values.wds_cp_name }}.localtest.me", "{{ .Values.transport_cp_name }}.localtest.me" ]
-      {{- end }}
       volumes:
       - name: shared-volume
         emptyDir: {}
