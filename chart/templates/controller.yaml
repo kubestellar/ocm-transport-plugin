@@ -12,11 +12,112 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otp-controller-manager
+  namespace: {{.Values.wds_cp_name}}-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: otp-leader-election-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: '{{.Values.wds_cp_name}}-otp-manager-role'
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tenancy.kflex.kubestellar.org
+  resources:
+  - controlplanes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tenancy.kflex.kubestellar.org
+  resources:
+  - controlplanes/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: otp-leader-election-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: otp-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: otp-controller-manager
+  namespace: '{{.Values.wds_cp_name}}-system'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: '{{.Values.wds_cp_name}}-otp-manager-rolebinding'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: '{{.Values.wds_cp_name}}-otp-manager-role'
+subjects:
+  - kind: ServiceAccount
+    name: otp-controller-manager
+    namespace: '{{.Values.wds_cp_name}}-system'
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: transport-controller-config
-  namespace: {{ .Values.wds_cp_name }}-system
+  namespace: {{.Values.wds_cp_name}}-system
 data:
   get-kubeconfig.sh: |
     #!/bin/bash
@@ -47,7 +148,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: transport-controller
-  namespace: {{ .Values.wds_cp_name }}-system
+  namespace: {{.Values.wds_cp_name}}-system
 spec:
   replicas: 1
   selector:
@@ -58,12 +159,12 @@ spec:
       labels:
         name: transport-controller
     spec:
-      serviceAccountName: kubestellar-controller-manager
+      serviceAccountName: otp-controller-manager
       initContainers:
       - name: setup-wds-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{ .Values.wds_cp_name }} true | base64 -d > /mnt/shared/wds-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.wds_cp_name}} true | base64 -d > /mnt/shared/wds-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -72,7 +173,7 @@ spec:
       - name: setup-imbs-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{ .Values.transport_cp_name }} true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.transport_cp_name}} true | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -86,7 +187,7 @@ spec:
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
-          - --wds-name={{ .Values.wds_cp_name }}
+          - --wds-name={{.Values.wds_cp_name}}
           - -v=4
           volumeMounts:
           - name: shared-volume
