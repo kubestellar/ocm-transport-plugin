@@ -16,45 +16,45 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: otp-controller-manager
+  name: transport-controller-sa
   namespace: {{.Values.wds_cp_name}}-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: otp-leader-election-role
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: otp-leader-election-role
+# rules:
+# - apiGroups:
+#   - ""
+#   resources:
+#   - configmaps
+#   verbs:
+#   - get
+#   - list
+#   - watch
+#   - create
+#   - update
+#   - patch
+#   - delete
+# - apiGroups:
+#   - coordination.k8s.io
+#   resources:
+#   - leases
+#   verbs:
+#   - get
+#   - list
+#   - watch
+#   - create
+#   - update
+#   - patch
+#   - delete
+# - apiGroups:
+#   - ""
+#   resources:
+#   - events
+#   verbs:
+#   - create
+#   - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -86,19 +86,19 @@ rules:
   - get
   - patch
   - update
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: otp-leader-election-rolebinding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: otp-leader-election-role
-subjects:
-- kind: ServiceAccount
-  name: otp-controller-manager
-  namespace: '{{.Values.wds_cp_name}}-system'
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: otp-leader-election-rolebinding
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: Role
+#   name: otp-leader-election-role
+# subjects:
+# - kind: ServiceAccount
+#   name: transport-controller-sa
+#   namespace: '{{.Values.wds_cp_name}}-system'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -110,7 +110,7 @@ roleRef:
   name: '{{.Values.wds_cp_name}}-otp-manager-role'
 subjects:
   - kind: ServiceAccount
-    name: otp-controller-manager
+    name: transport-controller-sa
     namespace: '{{.Values.wds_cp_name}}-system'
 ---
 apiVersion: v1
@@ -159,7 +159,7 @@ spec:
       labels:
         name: transport-controller
     spec:
-      serviceAccountName: otp-controller-manager
+      serviceAccountName: transport-controller-sa
       initContainers:
       - name: setup-wds-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
@@ -181,8 +181,8 @@ spec:
           mountPath: /mnt/shared
       containers:
         - name: transport-controller
-          image: otp_controller_image
-          # image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
+          # image: OTP_IMAGE_PLACEHOLDER
+          image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
           imagePullPolicy: IfNotPresent
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
