@@ -8,10 +8,12 @@ on:
 permissions:
   contents: write
   packages: write
- 
-# env:
-#   REGISTRY: ghcr.io
-#   CONTROLLER_IMAGE: kubestellar/ocm-transport-plugin/transport-controller
+
+env:
+  REGISTRY: ghcr.io
+  CONTROLLER_IMAGE: kubestellar/ocm-transport-plugin/transport-controller
+  IMAGE_NAME: ${{ github.repository }}/chart
+  CHART_PATH: ./chart
 
 jobs:
   goreleaser:
@@ -43,3 +45,22 @@ jobs:
         KO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USER: ${{ github.actor }}
         EMAIL: ${{ github.actor}}@users.noreply.github.com
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Login to registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Package and push chart
+      run: |
+        chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+        sed -i 's@OTP_IMAGE_PLACEHOLDER@${{ env.REGISTRY }}/${{ env.CONTROLLER_IMAGE }}:${{ github.ref_name }}@g' ${{ env.CHART_PATH }}/templates/controller.yaml
+        helm package ${{ env.CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
+        helm push ./*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
