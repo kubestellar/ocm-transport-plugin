@@ -18,49 +18,11 @@ kind: ServiceAccount
 metadata:
   name: transport-controller-sa
   namespace: {{.Values.wds_cp_name}}-system
-# ---
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: Role
-# metadata:
-#   name: otp-leader-election-role
-# rules:
-# - apiGroups:
-#   - ""
-#   resources:
-#   - configmaps
-#   verbs:
-#   - get
-#   - list
-#   - watch
-#   - create
-#   - update
-#   - patch
-#   - delete
-# - apiGroups:
-#   - coordination.k8s.io
-#   resources:
-#   - leases
-#   verbs:
-#   - get
-#   - list
-#   - watch
-#   - create
-#   - update
-#   - patch
-#   - delete
-# - apiGroups:
-#   - ""
-#   resources:
-#   - events
-#   verbs:
-#   - create
-#   - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
-  name: '{{.Values.wds_cp_name}}-otp-manager-role'
+  name: transport-controller-role
 rules:
 - apiGroups:
   - ""
@@ -86,28 +48,15 @@ rules:
   - get
   - patch
   - update
-# ---
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: RoleBinding
-# metadata:
-#   name: otp-leader-election-rolebinding
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: Role
-#   name: otp-leader-election-role
-# subjects:
-# - kind: ServiceAccount
-#   name: transport-controller-sa
-#   namespace: '{{.Values.wds_cp_name}}-system'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: '{{.Values.wds_cp_name}}-otp-manager-rolebinding'
+  name: transport-controller-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: '{{.Values.wds_cp_name}}-otp-manager-role'
+  name: transport-controller-role
 subjects:
   - kind: ServiceAccount
     name: transport-controller-sa
@@ -181,8 +130,8 @@ spec:
           mountPath: /mnt/shared
       containers:
         - name: transport-controller
-          # image: OTP_IMAGE_PLACEHOLDER
-          image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
+          image: OTP_IMAGE_PLACEHOLDER
+          # image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
           imagePullPolicy: IfNotPresent
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
