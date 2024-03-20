@@ -131,7 +131,6 @@ spec:
       containers:
         - name: transport-controller
           image: OTP_IMAGE_PLACEHOLDER
-          # image: ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:latest
           imagePullPolicy: IfNotPresent
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
