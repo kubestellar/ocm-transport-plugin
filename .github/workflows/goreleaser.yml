@@ -61,6 +61,6 @@ jobs:
     - name: Package and push chart
       run: |
         chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
-        sed -i 's@OTP_IMAGE_PLACEHOLDER@${{ env.REGISTRY }}/${{ env.CONTROLLER_IMAGE }}:${{ github.ref_name }}@g' ${{ env.CHART_PATH }}/templates/controller.yaml
+        sed -i 's@OTP_IMAGE_PLACEHOLDER@${{ env.REGISTRY }}/${{ env.CONTROLLER_IMAGE }}:${chartVersion}@g' ${{ env.CHART_PATH }}/templates/controller.yaml
         helm package ${{ env.CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
         helm push ./*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
