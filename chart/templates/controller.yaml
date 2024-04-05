@@ -16,12 +16,12 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: transport-controller-sa
+  name: transport-controller
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{.Values.wds_cp_name}}-transport-controller-role
+  name: {{.Values.wds_cp_name}}-transport-controller
 rules:
 - apiGroups:
   - ""
@@ -51,14 +51,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{.Values.wds_cp_name}}-transport-controller-rolebinding
+  name: {{.Values.wds_cp_name}}-transport-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{.Values.wds_cp_name}}-transport-controller-role
+  name: {{.Values.wds_cp_name}}-transport-controller
 subjects:
   - kind: ServiceAccount
-    name: transport-controller-sa
+    name: transport-controller
     namespace: {{.Release.Namespace}}
 ---
 apiVersion: v1
@@ -66,28 +66,37 @@ kind: ConfigMap
 metadata:
   name: transport-controller-config
 data:
-  get-kubeconfig.sh: |
-    #!/bin/bash
-    # this script receives a ControlPlane name and a parameter
-    # that determines whether to extract the ControlPlane's in-cluster kubeconfig
-    # or the external kubeconfig (if set to "true", the first will be retrieved).
-    # The function returns the requested kubeconfig's content in base64.
-    # it assumes the kubeconfig context is set to access the hosting cluster.
-
-    cpname="$1"
-    get_incluster_key="$2"
-
-    key=""
-    if [[ "$get_incluster_key" == "true" ]]; then
-      key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.inClusterKey}');
-    else
-      key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.key}');
+  get-its-config.sh: |
+    #!/bin/env bash
+    its_name="${1%"-system"}" # ITS name or ITS namespace
+    if [ "$its_name" = "" ] ; then
+        for cp in `kubectl get controlplane -o name`; do
+            cp=${cp##*/}
+            if kubectl get controlplane $cp -o=jsonpath='{.metadata.labels}' | grep "imbs" &> /dev/null ; then
+                if [ "$its_name" = "" ] ; then
+                    its_name=$cp
+                else
+                    >&2 echo "ERROR: found more than one Control Plane of type imbs!"
+                    exit 1
+                fi
+            fi
+        done
+        if [ "$its_name" = "" ] ; then
+            >&2 echo "ERROR: no Control Plane of type imbs found!"
+            exit 2
+        fi
     fi
-
-    # get secret details
-    secret_name=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.name}')
-    secret_namespace=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.namespace}')
-
+    key=$(kubectl get controlplane $its_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+    secret_name=$(kubectl get controlplane $its_name -o=jsonpath='{.status.secretRef.name}')
+    secret_namespace=$(kubectl get controlplane $its_name -o=jsonpath='{.status.secretRef.namespace}')
+    # get the kubeconfig in base64
+    kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
+  get-wds-config.sh: |
+    #!/bin/env bash
+    wds_name="${1%"-system"}" # WDS name or WDS namespace
+    key=$(kubectl get controlplane $wds_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+    secret_name=$(kubectl get controlplane $wds_name -o=jsonpath='{.status.secretRef.name}')
+    secret_namespace=$(kubectl get controlplane $wds_name -o=jsonpath='{.status.secretRef.namespace}')
     # get the kubeconfig in base64
     kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
 ---
@@ -105,12 +114,12 @@ spec:
       labels:
         name: transport-controller
     spec:
-      serviceAccountName: transport-controller-sa
+      serviceAccountName: transport-controller
       initContainers:
       - name: setup-wds-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.wds_cp_name}} true | base64 -d > /mnt/shared/wds-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-wds-config.sh {{.Values.wds_cp_name}} | base64 -d > /mnt/shared/wds-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -119,7 +128,7 @@ spec:
       - name: setup-its-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.transport_cp_name}} true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-its-config.sh {{.Values.transport_cp_name}} | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
