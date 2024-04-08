@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Set the name of the transport control plane
-transport_cp_name: imbs1
+transport_cp_name: its1
 
 # Set the name of the WDS control plane
 wds_cp_name: wds1
