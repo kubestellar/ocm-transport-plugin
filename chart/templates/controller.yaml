@@ -68,26 +68,28 @@ metadata:
   name: transport-controller-config
   namespace: {{.Release.Namespace}}
 data:
-  get-config.sh: |
+  get-kubeconfig.sh: |
     #!/bin/env bash
+    # Get the in-cluster kubeconfig for KubeFlex Control Planes
+    # get-kubeconfig.sh cp_name guess_its_name
     cp_name="${1%"-system"}" # cp name or cp namespace
-    guess_its_name="$2"
+    guess_its_name="$2" # true: try guessing the name of the ibms CP
     if [ "$cp_name" == "" ] ; then
       if [ "$guess_its_name" == "true" ] ; then
         for cp in `kubectl get controlplane -o name`; do
-            cp=${cp##*/}
-            if kubectl get controlplane $cp -o=jsonpath='{.metadata.labels}' | grep "imbs" &> /dev/null ; then
-                if [ "$cp_name" = "" ] ; then
-                    cp_name=$cp
-                else
-                    >&2 echo "ERROR: found more than one Control Plane of type imbs!"
-                    exit 1
-                fi
+          cp=${cp##*/} # separate just the CP name
+          if [ "$(kubectl get controlplane $cp -o jsonpath="{.metadata.labels['kflex\.kubestellar\.io/cptype']}")" == "imbs" ] ; then
+            if [ "$cp_name" == "" ] ; then
+              cp_name=$cp
+            else
+              >&2 echo "ERROR: found more than one Control Plane of type imbs!"
+              exit 1
             fi
+          fi
         done
-        if [ "$cp_name" = "" ] ; then
-            >&2 echo "ERROR: no Control Plane of type imbs found!"
-            exit 2
+        if [ "$cp_name" == "" ] ; then
+          >&2 echo "ERROR: no Control Plane of type imbs found!"
+          exit 2
         fi
       else
         >&2 echo "ERROR: no Control Plane name specified!"
@@ -120,7 +122,7 @@ spec:
       - name: setup-wds-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-config.sh {{.Values.wds_cp_name}} false | base64 -d > /mnt/shared/wds-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.wds_cp_name}} false | base64 -d > /mnt/shared/wds-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -129,7 +131,7 @@ spec:
       - name: setup-its-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-config.sh {{.Values.transport_cp_name}} true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.transport_cp_name}} true | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
