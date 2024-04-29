@@ -78,7 +78,7 @@ data:
       if [ "$guess_its_name" == "true" ] ; then
         for cp in `kubectl get controlplane -o name`; do
           cp=${cp##*/} # separate just the CP name
-          if [ "$(kubectl get controlplane $cp -o jsonpath="{.metadata.labels['kflex\.kubestellar\.io/cptype']}")" == "imbs" ] ; then
+          if [ "$(kubectl get controlplane $cp -o jsonpath="{.metadata.labels['kflex\.kubestellar\.io/cptype']}")" == "its" ] ; then
             if [ "$cp_name" == "" ] ; then
               cp_name=$cp
             else
