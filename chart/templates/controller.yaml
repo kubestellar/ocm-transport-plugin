@@ -80,15 +80,15 @@ data:
           cp=${cp##*/} # separate just the CP name
           if [ "$(kubectl get controlplane $cp -o jsonpath="{.metadata.labels['kflex\.kubestellar\.io/cptype']}")" == "its" ] ; then
             if [ "$cp_name" == "" ] ; then
-              cp_name=$cp
+              cp_name="$cp"
             else
-              >&2 echo "ERROR: found more than one Control Plane of type imbs!"
+              >&2 echo "ERROR: found more than one Control Plane of type its!"
               exit 1
             fi
           fi
         done
         if [ "$cp_name" == "" ] ; then
-          >&2 echo "ERROR: no Control Plane of type imbs found!"
+          >&2 echo "ERROR: no Control Plane of type its found!"
           exit 2
         fi
       else
@@ -122,7 +122,7 @@ spec:
       - name: setup-wds-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.wds_cp_name}} false | base64 -d > /mnt/shared/wds-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.Values.wds_cp_name}}' false | base64 -d > /mnt/shared/wds-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -131,7 +131,7 @@ spec:
       - name: setup-its-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh {{.Values.transport_cp_name}} true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.Values.transport_cp_name}}' true | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
