@@ -80,22 +80,17 @@ data:
     # check if the CP name is valid or needs to be guessed
     if [ "$cp_name" == "" ] ; then
       if [ "$guess_its_name" == "true" ] ; then
-        while [ "$cp_name" == "" ] ; do
-          for cp in `kubectl get controlplane -o name`; do
-            cp=${cp##*/} # separate just the CP name
-            if [ "$(kubectl get controlplane $cp -o jsonpath="{.metadata.labels['kflex\.kubestellar\.io/cptype']}")" == "its" ] ; then
-              if [ "$cp_name" == "" ] ; then
-                cp_name="$cp"
-                break 2
-              else
-                >&2 echo "ERROR: found more than one Control Plane of type its!"
-                exit 1
-              fi
-            fi
-          done
+        cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
+        case $(echo "$cps" | wc -l) in
+        (0)
           >&2 echo "Waiting for an ITS control plane to exist..."
-          sleep 10
-        done
+          sleep 10;;
+        (1)
+          cp_name="${cps%% *}";;
+        (*)
+          >&2 echo "ERROR: found more than one Control Plane of type its!"
+          exit 1;;
+        esac
       else
         >&2 echo "ERROR: no Control Plane name specified!"
         exit 3
@@ -160,7 +155,7 @@ spec:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
           - --wds-name={{.Values.wds_cp_name}}
-          - -v={{.Values.verbosity}}
+          - -v={{.Values.verbosity | default 4}}
           volumeMounts:
           - name: shared-volume
             mountPath: /mnt/shared
