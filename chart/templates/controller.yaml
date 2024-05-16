@@ -78,27 +78,28 @@ data:
     guess_its_name="$2" # true: try guessing the name of the ITS CP
 
     # check if the CP name is valid or needs to be guessed
-    if [ "$cp_name" == "" ] ; then
+    while [ "$cp_name" == "" ] ; do
       if [ "$guess_its_name" == "true" ] ; then
         cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
-        case $(echo "$cps" | wc -l) in
-        (0)
-          >&2 echo "Waiting for an ITS control plane to exist..."
-          sleep 10;;
-        (1)
-          cp_name="${cps%% *}";;
-        (*)
-          >&2 echo "ERROR: found more than one Control Plane of type its!"
-          exit 1;;
+        case $(echo -n "$cps" | grep -c '^') in
+          (0)
+            >&2 echo "Waiting for an ITS control plane to exist..."
+            sleep 10;;
+          (1)
+            cp_name="${cps%% *}"
+            break;;
+          (*)
+            >&2 echo "ERROR: found more than one Control Plane of type its!"
+            exit 1;;
         esac
       else
         >&2 echo "ERROR: no Control Plane name specified!"
         exit 3
       fi
-    fi
+    done
 
     # wait for the CP to exists and be ready
-    while [[ $(kubectl get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+    while [[ $(kubectl get controlplane "$cp_name" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
       >&2 echo "Waiting for \"$cp_name\" control plane to exist and be ready..."
       sleep 10
     done
