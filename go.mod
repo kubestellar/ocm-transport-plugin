@@ -3,7 +3,7 @@ module github.com/kubestellar/ocm-transport-plugin
 go 1.20
 
 require (
-	github.com/kubestellar/kubestellar v0.22.0-rc3
+	github.com/kubestellar/kubestellar v0.23.0-alpha.2
 	k8s.io/apimachinery v0.28.2
 	open-cluster-management.io/api v0.12.0
 )
@@ -33,7 +33,7 @@ require (
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kubestellar/kubeflex v0.4.2 // indirect
+	github.com/kubestellar/kubeflex v0.6.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
