@@ -17,3 +17,6 @@ transport_cp_name: ""
 
 # Set the name of the WDS control plane
 wds_cp_name: wds1
+
+# Set the controller verbosity
+verbosity: 4

@@ -145,7 +145,7 @@ spec:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
           - --wds-name={{.Values.wds_cp_name}}
-          - -v=4
+          - -v={{.Values.verbosity}}
           volumeMounts:
           - name: shared-volume
             mountPath: /mnt/shared
