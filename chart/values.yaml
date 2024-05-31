@@ -20,3 +20,17 @@ wds_cp_name: wds1
 
 # Set the controller verbosity
 verbosity: 4
+
+# [host]:port at which to listen for HTTP GET /metrics
+metrics_bind_addr: ":8090"
+
+# [host]:port at which to listen for HTTP GET /debug/pprof
+pprof_bind_addr: ":8092"
+
+# QPS and burst for accessing the ITS
+transport_qps: 5
+transport_burst: 10
+
+# QPS and burst for accessing the WDS
+wds_qps: 5
+qds_burst: 10
