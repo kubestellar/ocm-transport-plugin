@@ -33,4 +33,4 @@ transport_burst: 10
 
 # QPS and burst for accessing the WDS
 wds_qps: 5
-qds_burst: 10
+wds_burst: 10

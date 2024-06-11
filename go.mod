@@ -3,7 +3,7 @@ module github.com/kubestellar/ocm-transport-plugin
 go 1.20
 
 require (
-	github.com/kubestellar/kubestellar v0.23.0-alpha.4
+	github.com/kubestellar/kubestellar v0.23.0-rc1
 	k8s.io/apimachinery v0.28.2
 	open-cluster-management.io/api v0.12.0
 )
