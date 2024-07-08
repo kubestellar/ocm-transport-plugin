@@ -1,6 +1,6 @@
 module github.com/kubestellar/ocm-transport-plugin
 
-go 1.20
+go 1.21
 
 require (
 	github.com/kubestellar/kubestellar v0.23.0-rc2
